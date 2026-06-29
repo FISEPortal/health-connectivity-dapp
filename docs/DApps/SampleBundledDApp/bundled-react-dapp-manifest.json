@@ -1,0 +1,37 @@
+{
+  "dappId": "example-react-dapp",
+  "version": "1.0.0",
+  "manifestUrl": "https://marketplace.example.com/dapps/example-react-dapp/manifest.json",
+  "entryPoint": "dist/index.bundle.js",
+  "bundled": true,
+  "globalExport": "ExampleReactDApp",
+  "dependencies": {
+    "css": [
+      "dist/index.css"
+    ],
+    "scripts": [
+      "dist/vendor.js"
+    ]
+  },
+  "permissions": [
+    "profile:read",
+    "wallet:access"
+  ],
+  "category": "utilities",
+  "publisher": {
+    "name": "Example Developer",
+    "verified": true,
+    "website": "https://example.com"
+  },
+  "name": "Example React DApp",
+  "description": "A demonstration of a bundled React DApp for Signet",
+  "icon": "assets/icon.png",
+  "screenshots": [
+    "assets/screenshot1.png",
+    "assets/screenshot2.png"
+  ],
+  "details": {
+    "type": "html",
+    "content": "<h1>Example React DApp</h1><p>This is a demonstration of a bundled React DApp that works with Signet's secure interface.</p>"
+  }
+}
