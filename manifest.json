@@ -1,0 +1,47 @@
+{
+  "dappId": "7f3b1c20-9d4e-4a6b-bf2a-2c5e8d11a4f0",
+  "version": "0.1.0",
+  "manifestUrl": "/dapps/health-connectivity/manifest.json",
+  "entryPoint": "dist/index.bundle.js",
+  "bundled": true,
+  "globalExport": "DApp",
+  "dependencies": {
+    "css": [
+      "dist/index.css"
+    ],
+    "scripts": [
+      "https://unpkg.com/react@18/umd/react.production.min.js",
+      "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ]
+  },
+  "permissions": [
+    "profile:read",
+    "wallet:sign"
+  ],
+  "parameters": {
+    "apiBaseUrl": {
+      "type": "string",
+      "secure": false,
+      "description": "TrustVault storage API base URL"
+    },
+    "apiToken": {
+      "type": "string",
+      "secure": true,
+      "description": "Bearer token for TrustVault storage"
+    }
+  },
+  "category": "health",
+  "publisher": {
+    "name": "FISE Team",
+    "verified": true,
+    "website": "https://fisetech.ai"
+  },
+  "name": "Health Connectivity",
+  "description": "Connect Oura, Garmin and Apple Health wearables and archive biometric data into your Signet vault.",
+  "icon": "public/icon.png",
+  "screenshots": [],
+  "details": {
+    "type": "file",
+    "content": "public/details.js"
+  }
+}
