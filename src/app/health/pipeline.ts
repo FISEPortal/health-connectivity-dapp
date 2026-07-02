@@ -258,17 +258,12 @@ export async function uploadArchives(
             const blob = createEncryptedFile(enc, name, 'application/json');
             const result = await uploadFile(blob, groupName, {
                 encrypted: 'true',
-                originalName: name,
-                mimeType: 'application/json',
                 dataType: 'health_archive',
                 provider: archive.provider,
                 grouping: archive.period.grouping,
                 period: archive.period.label,
-                recordCount: String(archive.recordCount),
-                contentHash: archive.contentHash,
                 deviceCredentialId: archive.deviceCredentialId,
                 consentScope: archive.consentScope, // the SIGNED value, not recomputed
-                requiresNft: String(archive.requiresNft),
             });
             outcomes.push({
                 archiveId: archive.archiveId,

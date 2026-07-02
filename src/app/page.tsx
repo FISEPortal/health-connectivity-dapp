@@ -46,9 +46,20 @@ export default function Home() {
                     return MOCK_DID;
                 },
                 async getParameters() {
+                    // Fetch a real JWT from the local dev API route so trustvault-api's
+                    // jwt.verify() accepts it.  Falls back gracefully if the route fails.
+                    let apiToken: string | undefined;
+                    try {
+                        const res = await fetch('/api/dev-token');
+                        if (res.ok) {
+                            const data = await res.json() as { token?: string };
+                            apiToken = data.token;
+                        }
+                    } catch {
+                        // leave apiToken undefined — upload will 401, but at least the DApp mounts
+                    }
                     return {
-                        apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080',
-                        apiToken: process.env.NEXT_PUBLIC_DEV_API_TOKEN || 'dev-mock-token',
+                        apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080', apiToken,
                     };
                 },
                 async getWalletAccess() {
