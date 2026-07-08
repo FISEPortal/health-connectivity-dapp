@@ -179,21 +179,23 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
         p: { color: '#94a3b8', fontSize: '14px', margin: 0, overflowWrap: 'anywhere' as const },
         helper: { color: '#64748b', fontSize: '12px', margin: 0, lineHeight: 1.5 },
         banner: { background: 'rgba(56, 189, 248, 0.05)', color: '#cbd5e1', border: '1px solid rgba(56, 189, 248, 0.2)', borderRadius: '12px', padding: '16px', fontSize: '14px', lineHeight: 1.55 },
-        providerGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(240px, 100%), 1fr))', gap: '16px' },
-        providerCard: (clickable: boolean, on: boolean) => ({ backgroundColor: on ? '#0b1220' : '#0d1424', border: `1px solid ${on ? '#38bdf8' : '#1f2937'}`, borderRadius: '12px', padding: '18px', display: 'flex', flexDirection: 'column' as const, gap: '10px', opacity: clickable ? 1 : 0.6 }),
+        providerGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: '12px' },
+        // The whole block is the button (no inner Connect button, no data-type list):
+        // one compact row per provider - logo, name + one-line summary, action hint.
+        providerCard: (clickable: boolean, on: boolean) => ({ backgroundColor: on ? '#0b1220' : '#0d1424', border: `1px solid ${on ? '#38bdf8' : '#1f2937'}`, borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '12px', opacity: clickable ? 1 : 0.6, cursor: clickable ? 'pointer' : 'default', width: '100%', textAlign: 'left' as const, font: 'inherit', color: 'inherit', minHeight: '68px', boxSizing: 'border-box' as const }),
+        providerBody: { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' as const, gap: '2px' },
+        providerAction: (on: boolean) => ({ color: on ? '#0b0f19' : '#38bdf8', background: on ? '#38bdf8' : 'rgba(56, 189, 248, 0.1)', border: `1px solid ${on ? '#38bdf8' : 'rgba(56, 189, 248, 0.35)'}`, borderRadius: '9999px', padding: '5px 13px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' as const, flexShrink: 0 }),
         logoChip: { display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '10px', background: '#0b1220', border: '1px solid #1f2937', flexShrink: 0 } as const,
-        providerHead: { display: 'flex', alignItems: 'center', gap: '12px', minHeight: '44px' },
         formGroup: { display: 'flex', flexDirection: 'column' as const, gap: '8px' },
         grid2: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '18px' },
         label: { fontSize: '13px', fontWeight: 600, color: '#cbd5e1' },
         input: { backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', padding: '10px 14px', color: '#f1f5f9', fontSize: '14px', outline: 'none', minHeight: '44px', boxSizing: 'border-box' as const },
         select: { backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', padding: '10px 14px', color: '#f1f5f9', fontSize: '14px', outline: 'none', cursor: 'pointer', minHeight: '44px', boxSizing: 'border-box' as const },
-        toggleGroup: { display: 'flex', background: '#1f2937', borderRadius: '8px', padding: '2px', width: 'fit-content' },
+        toggleGroup: { display: 'flex', flexWrap: 'wrap' as const, background: '#1f2937', borderRadius: '8px', padding: '2px', width: 'fit-content', maxWidth: '100%' },
         toggleBtn: (active: boolean) => ({ backgroundColor: active ? '#38bdf8' : 'transparent', color: active ? '#0b0f19' : '#cbd5e1', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }),
         btn: (disabled: boolean) => ({ background: disabled ? '#1f2937' : 'linear-gradient(to right, #38bdf8, #3b82f6)', color: disabled ? '#64748b' : '#ffffff', padding: '12px 24px', border: 'none', borderRadius: '8px', cursor: disabled ? 'not-allowed' : 'pointer', fontWeight: 600 as const, width: 'fit-content', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }),
-        connectBtn: { background: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', width: 'fit-content', marginTop: '4px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' },
         link: { background: 'none', border: 'none', color: '#818cf8', cursor: 'pointer', fontSize: '13px', fontWeight: 600, padding: 0 },
-        comingSoon: { color: '#64748b', fontSize: '12px', fontWeight: 600, border: '1px solid #1f2937', borderRadius: '9999px', padding: '4px 10px', width: 'fit-content', marginTop: '4px' },
+        comingSoon: { color: '#64748b', fontSize: '12px', fontWeight: 600, border: '1px solid #1f2937', borderRadius: '9999px', padding: '5px 13px', whiteSpace: 'nowrap' as const, flexShrink: 0 },
         chip: { display: 'inline-block', background: 'rgba(56, 189, 248, 0.1)', color: '#7dd3fc', padding: '3px 9px', borderRadius: '6px', fontSize: '11px', fontWeight: 600, margin: '0 6px 6px 0' },
         archiveCard: { backgroundColor: '#0d1424', border: '1px solid #1f2937', borderRadius: '10px', padding: '14px 16px', display: 'flex', flexDirection: 'column' as const, gap: '8px' },
         nft: (yes: boolean) => ({ fontSize: '12px', fontWeight: 600, color: yes ? '#fbbf24' : '#64748b', whiteSpace: 'nowrap' as const }),
@@ -229,10 +231,9 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
                 <span style={s.badge}>Secured by Signet</span>
             </div>
 
-            <div style={s.card}>
-                <h3 style={s.h3}>Profile</h3>
-                <p style={s.p}><strong>Secure Identity (DID):</strong> {did ?? 'Resolving…'}</p>
-            </div>
+            {/* Profile/DID card intentionally removed - the Signet container already
+                shows the user's identity (review feedback). The DID still drives the
+                pipeline via `did` state below. */}
 
             {/* CONNECTIONS HUB */}
             <div style={s.card}>
@@ -243,32 +244,26 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
                         const isActive = p.status === 'active';
                         const on = selected === p.id;
                         return (
-                            <div key={p.id} style={s.providerCard(isActive, on)}>
-                                <div style={s.providerHead}>
-                                    {p.wordmark ? (
-                                        <ProviderLogo id={p.id} color={isActive ? p.color : '#64748b'} width={150} height={22} />
-                                    ) : (
-                                        <>
-                                            <span style={s.logoChip}>
-                                                <ProviderLogo id={p.id} color={isActive ? p.color : '#64748b'} width={26} height={26} />
-                                            </span>
-                                            <div>
-                                                <div style={{ fontSize: '15px', fontWeight: 600, color: '#f1f5f9' }}>{p.name}</div>
-                                                <div style={{ fontSize: '12px', color: '#64748b' }}>{p.manufacturer}</div>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                                <p style={s.p}>{p.summary}</p>
-                                <div>{p.dataTypes.slice(0, 6).map((t) => <span key={t} style={s.chip}>{friendlyDataType(t)}</span>)}</div>
+                            <button
+                                key={p.id}
+                                style={s.providerCard(isActive, on)}
+                                onClick={() => isActive && connect(p.id)}
+                                disabled={!isActive}
+                                aria-pressed={on}
+                            >
+                                <span style={s.logoChip}>
+                                    <ProviderLogo id={p.id} color={isActive ? p.color : '#64748b'} width={p.wordmark ? 38 : 26} height={p.wordmark ? 12 : 26} />
+                                </span>
+                                <span style={s.providerBody}>
+                                    <span style={{ fontSize: '15px', fontWeight: 600, color: '#f1f5f9' }}>{p.name}</span>
+                                    <span style={{ fontSize: '12px', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.summary}</span>
+                                </span>
                                 {isActive ? (
-                                    <button style={s.connectBtn} onClick={() => connect(p.id)}>
-                                        {on ? 'Selected' : 'Connect'}
-                                    </button>
+                                    <span style={s.providerAction(on)}>{on ? 'Selected' : 'Connect'}</span>
                                 ) : (
                                     <span style={s.comingSoon}>Coming soon</span>
                                 )}
-                            </div>
+                            </button>
                         );
                     })}
                 </div>
@@ -277,7 +272,7 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
             {/* CAPTURE FLOW */}
             {provider && (
                 <div style={s.card}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                         <h3 style={s.h3}>Capture · {provider.name}</h3>
                         <button style={s.link} onClick={() => { setSelected(null); resetResults(); }}>← Change device</button>
                     </div>
@@ -337,8 +332,8 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
                     <div style={s.formGroup}>
                         <label style={s.label}>Storage</label>
                         <div style={s.toggleGroup}>
-                            <button style={s.toggleBtn(storageMode === 'personal')} onClick={() => setStorageMode('personal')}>Personal (private, no NFT)</button>
-                            <button style={s.toggleBtn(storageMode === 'shareable')} onClick={() => setStorageMode('shareable')}>Shareable (mints 1 NFT per archive)</button>
+                            <button style={s.toggleBtn(storageMode === 'personal')} onClick={() => setStorageMode('personal')}>Personal</button>
+                            <button style={s.toggleBtn(storageMode === 'shareable')} onClick={() => setStorageMode('shareable')}>Shareable</button>
                         </div>
                         <p style={s.helper}>Shareable archives are each represented by an NFT (~1 cent each). Personal archives stay encrypted in your vault with no fee.</p>
                     </div>
