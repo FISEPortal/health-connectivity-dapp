@@ -45,6 +45,14 @@ function friendlyError(e: unknown): string {
     return msg || 'Something went wrong.';
 }
 
+// Storage-side variant: upload failures are about Signet storage, not the provider.
+function friendlyUploadError(e: string | undefined): string {
+    if (!e) return 'unknown error';
+    if (/CORS|Failed to fetch|NetworkError/i.test(e))
+        return 'Could not reach Signet storage - check that the storage backend is running and its URL is configured.';
+    return e;
+}
+
 // ─── App ────────────────────────────────────────────────────────────────────
 
 function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
@@ -359,7 +367,7 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
                                 <strong>Personal storage - no NFT, no fee.</strong> {estimate.recordCount} records folded into {estimate.archiveCount} encrypted archive(s).
                             </>
                         )}
-                        <div style={{ marginTop: '6px', color: '#94a3b8' }}>≈ {estimate.compressionRatio} records per archive - that is the grouping benefit.</div>
+                        <div style={{ marginTop: '6px', color: '#94a3b8' }}>≈ {Math.round(estimate.compressionRatio * 10) / 10} records per archive - that is the grouping benefit.</div>
                     </div>
 
                     {archives.map((a) => (
@@ -387,7 +395,7 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
                         <div key={u.archiveId} style={s.archiveCard}>
                             <strong>{u.label}</strong>
                             <p style={s.statusLine(u.ok ? 'success' : 'warn')}>
-                                {u.ok ? `Stored · CID ${u.cid ?? u.id ?? '-'}` : `Failed · ${u.error ?? 'unknown error'}`}
+                                {u.ok ? `Stored · CID ${u.cid ?? u.id ?? '-'}` : `Failed · ${friendlyUploadError(u.error)}`}
                             </p>
                         </div>
                     ))}
