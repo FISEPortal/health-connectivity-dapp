@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "bundle": "node scripts/prepare-bundle.js",
-    "check": "node scripts/run-checks.js"
+    "check": "node scripts/run-checks.js && node scripts/no-colour-literals.js",
+    "check:colours": "node scripts/no-colour-literals.js"
   },
   "dependencies": {
     "next": "15.5.2",

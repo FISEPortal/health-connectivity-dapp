@@ -15,6 +15,7 @@ import { PROVIDERS, getProvider } from '@/app/providers/registry';
 import { buildArchives, uploadArchives } from '@/app/health/pipeline';
 import { ProviderLogo } from '@/app/components/ProviderLogo';
 import { friendlyDataType } from '@/app/health/labels';
+import { paletteFor, type Palette, type ThemeName } from '@/app/health/theme';
 
 // ─── Runtime config ───────────────────────────────────────────────────────────
 // Signet (or the local mock) injects { apiToken, apiBaseUrl } via getParameters().
@@ -55,7 +56,10 @@ function friendlyUploadError(e: string | undefined): string {
 
 // ─── App ────────────────────────────────────────────────────────────────────
 
-function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
+function App({ secureInterface, theme }: { secureInterface: SecureInterface | null; theme: ThemeName }) {
+    // Every colour below comes from here, so a theme change is one re-render, not a repaint
+    // scattered across the tree.
+    const c: Palette = paletteFor(theme);
     const [did, setDid] = useState<string | null>(null);
 
     // capture-flow inputs
@@ -177,37 +181,37 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
     const dollars = (cents: number): string => `$${(cents / 100).toFixed(2)}`;
 
     const s = {
-        root: { backgroundColor: '#090d16', color: '#f1f5f9', padding: 'clamp(16px, 4vw, 32px)', fontFamily: 'system-ui, -apple-system, sans-serif', minHeight: '100dvh', boxSizing: 'border-box' as const, display: 'flex', flexDirection: 'column' as const, gap: 'clamp(16px, 3vw, 24px)' },
-        header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #1e293b', paddingBottom: '16px', gap: '16px', flexWrap: 'wrap' as const },
-        h1: { margin: 0, fontSize: '26px', fontWeight: 700, background: 'linear-gradient(to right, #38bdf8, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-        subtitle: { margin: '6px 0 0 0', color: '#94a3b8', fontSize: '14px' },
-        badge: { background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(52, 211, 153, 0.3)', padding: '4px 12px', borderRadius: '9999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' as const },
-        card: { backgroundColor: '#111827', border: '1px solid #1f2937', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column' as const, gap: '18px' },
-        h3: { color: '#38bdf8', fontSize: '15px', fontWeight: 600, margin: 0, textTransform: 'uppercase' as const, letterSpacing: '0.05em' },
-        p: { color: '#94a3b8', fontSize: '14px', margin: 0, overflowWrap: 'anywhere' as const },
-        helper: { color: '#64748b', fontSize: '12px', margin: 0, lineHeight: 1.5 },
-        banner: { background: 'rgba(56, 189, 248, 0.05)', color: '#cbd5e1', border: '1px solid rgba(56, 189, 248, 0.2)', borderRadius: '12px', padding: '16px', fontSize: '14px', lineHeight: 1.55 },
+        root: { backgroundColor: c.ground, color: c.ink, padding: 'clamp(16px, 4vw, 32px)', fontFamily: 'system-ui, -apple-system, sans-serif', minHeight: '100dvh', boxSizing: 'border-box' as const, display: 'flex', flexDirection: 'column' as const, gap: 'clamp(16px, 3vw, 24px)' },
+        header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: `1px solid ${c.line}`, paddingBottom: '16px', gap: '16px', flexWrap: 'wrap' as const },
+        h1: { margin: 0, fontSize: '26px', fontWeight: 700, background: `linear-gradient(to right, ${c.titleFrom}, ${c.titleTo})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+        subtitle: { margin: '6px 0 0 0', color: c.inkMuted, fontSize: '14px' },
+        badge: { background: c.successWash, color: c.success, border: `1px solid ${c.successBorder}`, padding: '4px 12px', borderRadius: '9999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' as const },
+        card: { backgroundColor: c.surface, border: `1px solid ${c.line}`, borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column' as const, gap: '18px' },
+        h3: { color: c.accent, fontSize: '15px', fontWeight: 600, margin: 0, textTransform: 'uppercase' as const, letterSpacing: '0.05em' },
+        p: { color: c.inkMuted, fontSize: '14px', margin: 0, overflowWrap: 'anywhere' as const },
+        helper: { color: c.inkFaint, fontSize: '12px', margin: 0, lineHeight: 1.5 },
+        banner: { background: c.accentWash, color: c.inkMuted, border: `1px solid ${c.accentBorder}`, borderRadius: '12px', padding: '16px', fontSize: '14px', lineHeight: 1.55 },
         providerGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: '12px' },
         // The whole block is the button (no inner Connect button, no data-type list):
         // one compact row per provider - logo, name + one-line summary, action hint.
-        providerCard: (clickable: boolean, on: boolean) => ({ backgroundColor: on ? '#0b1220' : '#0d1424', border: `1px solid ${on ? '#38bdf8' : '#1f2937'}`, borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '12px', opacity: clickable ? 1 : 0.6, cursor: clickable ? 'pointer' : 'default', width: '100%', textAlign: 'left' as const, font: 'inherit', color: 'inherit', minHeight: '68px', boxSizing: 'border-box' as const }),
+        providerCard: (clickable: boolean, on: boolean) => ({ backgroundColor: on ? c.surfaceSunken : c.surface, border: `1px solid ${on ? c.accent : c.line}`, borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '12px', opacity: clickable ? 1 : 0.6, cursor: clickable ? 'pointer' : 'default', width: '100%', textAlign: 'left' as const, font: 'inherit', color: 'inherit', minHeight: '68px', boxSizing: 'border-box' as const }),
         providerBody: { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' as const, gap: '2px' },
-        providerAction: (on: boolean) => ({ color: on ? '#0b0f19' : '#38bdf8', background: on ? '#38bdf8' : 'rgba(56, 189, 248, 0.1)', border: `1px solid ${on ? '#38bdf8' : 'rgba(56, 189, 248, 0.35)'}`, borderRadius: '9999px', padding: '5px 13px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' as const, flexShrink: 0 }),
-        logoChip: { display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '10px', background: '#0b1220', border: '1px solid #1f2937', flexShrink: 0 } as const,
+        providerAction: (on: boolean) => ({ color: on ? c.onAccent : c.accent, background: on ? c.accent : c.accentWashStrong, border: `1px solid ${on ? c.accent : c.accentBorder}`, borderRadius: '9999px', padding: '5px 13px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' as const, flexShrink: 0 }),
+        logoChip: { display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '10px', background: c.surfaceSunken, border: `1px solid ${c.line}`, flexShrink: 0 } as const,
         formGroup: { display: 'flex', flexDirection: 'column' as const, gap: '8px' },
         grid2: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '18px' },
-        label: { fontSize: '13px', fontWeight: 600, color: '#cbd5e1' },
-        input: { backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', padding: '10px 14px', color: '#f1f5f9', fontSize: '14px', outline: 'none', minHeight: '44px', boxSizing: 'border-box' as const },
-        select: { backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', padding: '10px 14px', color: '#f1f5f9', fontSize: '14px', outline: 'none', cursor: 'pointer', minHeight: '44px', boxSizing: 'border-box' as const },
-        toggleGroup: { display: 'flex', flexWrap: 'wrap' as const, background: '#1f2937', borderRadius: '8px', padding: '2px', width: 'fit-content', maxWidth: '100%' },
-        toggleBtn: (active: boolean) => ({ backgroundColor: active ? '#38bdf8' : 'transparent', color: active ? '#0b0f19' : '#cbd5e1', border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }),
-        btn: (disabled: boolean) => ({ background: disabled ? '#1f2937' : 'linear-gradient(to right, #38bdf8, #3b82f6)', color: disabled ? '#64748b' : '#ffffff', padding: '12px 24px', border: 'none', borderRadius: '8px', cursor: disabled ? 'not-allowed' : 'pointer', fontWeight: 600 as const, width: 'fit-content', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }),
-        link: { background: 'none', border: 'none', color: '#818cf8', cursor: 'pointer', fontSize: '13px', fontWeight: 600, padding: 0 },
-        comingSoon: { color: '#64748b', fontSize: '12px', fontWeight: 600, border: '1px solid #1f2937', borderRadius: '9999px', padding: '5px 13px', whiteSpace: 'nowrap' as const, flexShrink: 0 },
-        chip: { display: 'inline-block', background: 'rgba(56, 189, 248, 0.1)', color: '#7dd3fc', padding: '3px 9px', borderRadius: '6px', fontSize: '11px', fontWeight: 600, margin: '0 6px 6px 0' },
-        archiveCard: { backgroundColor: '#0d1424', border: '1px solid #1f2937', borderRadius: '10px', padding: '14px 16px', display: 'flex', flexDirection: 'column' as const, gap: '8px' },
-        nft: (yes: boolean) => ({ fontSize: '12px', fontWeight: 600, color: yes ? '#fbbf24' : '#64748b', whiteSpace: 'nowrap' as const }),
-        statusLine: (t: Tone) => ({ fontSize: '14px', margin: 0, fontWeight: 500, color: t === 'warn' ? '#fbbf24' : t === 'success' ? '#34d399' : '#38bdf8' }),
+        label: { fontSize: '13px', fontWeight: 600, color: c.inkMuted },
+        input: { backgroundColor: c.field, border: `1px solid ${c.fieldBorder}`, borderRadius: '8px', padding: '10px 14px', color: c.ink, fontSize: '14px', outline: 'none', minHeight: '44px', boxSizing: 'border-box' as const },
+        select: { backgroundColor: c.field, border: `1px solid ${c.fieldBorder}`, borderRadius: '8px', padding: '10px 14px', color: c.ink, fontSize: '14px', outline: 'none', cursor: 'pointer', minHeight: '44px', boxSizing: 'border-box' as const },
+        toggleGroup: { display: 'flex', flexWrap: 'wrap' as const, background: c.field, borderRadius: '8px', padding: '2px', width: 'fit-content', maxWidth: '100%' },
+        toggleBtn: (active: boolean) => ({ backgroundColor: active ? c.accent : 'transparent', color: active ? c.onAccent : c.inkMuted, border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }),
+        btn: (disabled: boolean) => ({ background: disabled ? c.field : `linear-gradient(to right, ${c.buttonFrom}, ${c.buttonTo})`, color: disabled ? c.inkFaint : c.onAccent, padding: '12px 24px', border: 'none', borderRadius: '8px', cursor: disabled ? 'not-allowed' : 'pointer', fontWeight: 600 as const, width: 'fit-content', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }),
+        link: { background: 'none', border: 'none', color: c.accent, cursor: 'pointer', fontSize: '13px', fontWeight: 600, padding: 0 },
+        comingSoon: { color: c.inkFaint, fontSize: '12px', fontWeight: 600, border: `1px solid ${c.line}`, borderRadius: '9999px', padding: '5px 13px', whiteSpace: 'nowrap' as const, flexShrink: 0 },
+        chip: { display: 'inline-block', background: c.accentWashStrong, color: c.accent, padding: '3px 9px', borderRadius: '6px', fontSize: '11px', fontWeight: 600, margin: '0 6px 6px 0' },
+        archiveCard: { backgroundColor: c.surfaceSunken, border: `1px solid ${c.line}`, borderRadius: '10px', padding: '14px 16px', display: 'flex', flexDirection: 'column' as const, gap: '8px' },
+        nft: (yes: boolean) => ({ fontSize: '12px', fontWeight: 600, color: yes ? c.warn : c.inkFaint, whiteSpace: 'nowrap' as const }),
+        statusLine: (t: Tone) => ({ fontSize: '14px', margin: 0, fontWeight: 500, color: t === 'warn' ? c.warn : t === 'success' ? c.success : c.accent }),
     };
 
     if (!secureInterface) {
@@ -260,11 +264,11 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
                                 aria-pressed={on}
                             >
                                 <span style={s.logoChip}>
-                                    <ProviderLogo id={p.id} color={isActive ? p.color : '#64748b'} width={p.wordmark ? 38 : 26} height={p.wordmark ? 12 : 26} />
+                                    <ProviderLogo id={p.id} color={isActive ? p.color : c.inkFaint} width={p.wordmark ? 38 : 26} height={p.wordmark ? 12 : 26} />
                                 </span>
                                 <span style={s.providerBody}>
-                                    <span style={{ fontSize: '15px', fontWeight: 600, color: '#f1f5f9' }}>{p.name}</span>
-                                    <span style={{ fontSize: '12px', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.summary}</span>
+                                    <span style={{ fontSize: '15px', fontWeight: 600, color: c.ink }}>{p.name}</span>
+                                    <span style={{ fontSize: '12px', color: c.inkFaint, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.summary}</span>
                                 </span>
                                 {isActive ? (
                                     <span style={s.providerAction(on)}>{on ? 'Selected' : 'Connect'}</span>
@@ -367,7 +371,7 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
                                 <strong>Personal storage - no NFT, no fee.</strong> {estimate.recordCount} records folded into {estimate.archiveCount} encrypted archive(s).
                             </>
                         )}
-                        <div style={{ marginTop: '6px', color: '#94a3b8' }}>≈ {Math.round(estimate.compressionRatio * 10) / 10} records per archive - that is the grouping benefit.</div>
+                        <div style={{ marginTop: '6px', color: c.inkMuted }}>≈ {Math.round(estimate.compressionRatio * 10) / 10} records per archive - that is the grouping benefit.</div>
                     </div>
 
                     {archives.map((a) => (
@@ -409,25 +413,67 @@ function App({ secureInterface }: { secureInterface: SecureInterface | null }) {
 
 // ─── init ─────────────────────────────────────────────────────────────────────
 
-export function init(container: HTMLElement, secureInterface: SecureInterface | null): () => void {
+export function init(
+    container: HTMLElement,
+    secureInterface: SecureInterface | null,
+    params?: Record<string, unknown>,
+): () => void {
     const root = createRoot(container);
-    const render = (params: Record<string, unknown>): void => {
+
+    /*
+      Signet hands the theme in as the third argument and broadcasts later changes on a
+      signet:theme window event. This DApp used to read its config only from getParameters(),
+      which carries apiToken, apiBaseUrl and env and no theme, so the value was always there and
+      never read: the panel stayed dark inside a light product. See THEME-SPEC.md.
+
+      Anything that is not 'dark' resolves to light, so a host that sends nothing gets the
+      product's default rather than whichever theme this DApp was first built in.
+    */
+    let theme: ThemeName = params?.theme === 'dark' ? 'dark' : 'light';
+
+    const render = (resolved: Record<string, unknown>): void => {
         runtimeConfig = {
-            apiToken: typeof params.apiToken === 'string' ? params.apiToken : undefined,
-            apiBaseUrl: typeof params.apiBaseUrl === 'string' ? params.apiBaseUrl : '',
+            apiToken: typeof resolved.apiToken === 'string' ? resolved.apiToken : undefined,
+            apiBaseUrl: typeof resolved.apiBaseUrl === 'string' ? resolved.apiBaseUrl : '',
         };
         root.render(
             <React.StrictMode>
-                <App secureInterface={secureInterface} />
+                <App secureInterface={secureInterface} theme={theme} />
             </React.StrictMode>,
         );
     };
-    if (secureInterface?.getParameters) {
-        secureInterface.getParameters().then(render).catch(() => render({}));
-    } else {
-        render({});
+
+    let latest: Record<string, unknown> = params ?? {};
+    const onTheme = (event: Event): void => {
+        const next = (event as CustomEvent<{ theme?: unknown }>).detail?.theme;
+        // Ignore anything malformed rather than falling back and flipping the user's theme
+        // out from under them.
+        if (next !== 'dark' && next !== 'light') return;
+        if (next === theme) return;
+        theme = next;
+        render(latest);
+    };
+    if (typeof window !== 'undefined') {
+        window.addEventListener('signet:theme', onTheme as EventListener);
     }
-    return () => root.unmount();
+
+    if (secureInterface?.getParameters) {
+        secureInterface
+            .getParameters()
+            .then((p) => { latest = { ...latest, ...p }; render(latest); })
+            .catch(() => render(latest));
+    } else {
+        render(latest);
+    }
+
+    // Unsubscribing matters: without it a remount stacks listeners and every theme flip
+    // re-renders the DApp once per past mount.
+    return () => {
+        if (typeof window !== 'undefined') {
+            window.removeEventListener('signet:theme', onTheme as EventListener);
+        }
+        root.unmount();
+    };
 }
 
 if (typeof window !== 'undefined') {

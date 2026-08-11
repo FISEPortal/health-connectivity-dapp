@@ -9,6 +9,7 @@ import { buildArchives, uploadArchives } from '@/app/health/pipeline';
 import { collectRecords } from '@/app/providers/collect';
 import { scanForPii, PiiDetectedError } from '@/lib/device-connectivity/normalizer/oura-normalizer';
 import { planArchives, estimateNft } from '@/app/health/archiver';
+import { paletteFor, themeNameFrom, LIGHT, DARK, type Palette } from '@/app/health/theme';
 import type { SecureInterface } from '@/app/health/secure-interface';
 import type { CanonicalHealthRecord } from '@/lib/device-connectivity/types';
 import {
@@ -247,6 +248,60 @@ async function collectCheck(): Promise<void> {
     console.log('  collect determinism + record counts OK');
 }
 
+/*
+  Theme. Opening this DApp inside Signet used to drop the user from a light product into a dark
+  one, because the theme arrives as init's third argument and this DApp read only
+  getParameters(), which carries no theme. These cover the resolver and the palettes; the
+  subscription itself is exercised in a browser (see THEME-LOG.md).
+*/
+function themeCheck(): void {
+    assert(paletteFor('dark') === DARK, "'dark' resolves to the dark palette");
+    assert(paletteFor('light') === LIGHT, "'light' resolves to the light palette");
+
+    // Anything unrecognised must land on light: the product's default, not whichever theme this
+    // DApp happened to be built in first.
+    for (const bad of [undefined, null, '', 'DARK', 'Dark', 0, 1, {}, [], 'nonsense']) {
+        assert(paletteFor(bad) === LIGHT, 'unrecognised theme ' + JSON.stringify(bad) + ' resolves to light');
+        assert(themeNameFrom(bad) === 'light', 'themeNameFrom(' + JSON.stringify(bad) + ') is light');
+    }
+    assert(themeNameFrom('dark') === 'dark', "themeNameFrom('dark') is dark");
+
+    // A token defined in one theme and missing in the other renders as undefined, which paints
+    // nothing and is invisible until someone opens that theme.
+    const lk = Object.keys(LIGHT).sort();
+    const dk = Object.keys(DARK).sort();
+    assert(lk.join(',') === dk.join(','), 'light and dark define exactly the same tokens');
+
+    // Every value must actually be a colour. A stray empty string silently removes a background.
+    const looksLikeColour = (v: string): boolean => /^#[0-9a-f]{6}$/i.test(v) || /^rgba?\(/.test(v);
+    for (const theme of [LIGHT, DARK]) {
+        for (const [name, value] of Object.entries(theme)) {
+            assert(typeof value === 'string' && value.length > 0, name + ' is a non-empty string');
+            assert(looksLikeColour(value as string), name + ' is a colour, got ' + value);
+        }
+    }
+
+    // The two themes must genuinely differ where it counts, or a "fix" that changed nothing
+    // would still pass everything above.
+    const mustDiffer: (keyof Palette)[] = ['ground', 'surface', 'ink', 'line'];
+    for (const key of mustDiffer) {
+        assert(LIGHT[key] !== DARK[key], key + ' differs between the themes');
+    }
+
+    // The light ground is Signet's own token, not an approximation.
+    assert(LIGHT.ground === '#f4fafa', 'light ground is Signet --bg #f4fafa');
+    assert(LIGHT.surface === '#ffffff', 'light surface is Signet --surface #ffffff');
+    assert(LIGHT.ink === '#1f2330', 'light ink is Signet --ink #1f2330');
+    assert(LIGHT.accent === '#0084c0', 'light accent is Signet brand blue #0084c0');
+
+
+    // Caught by looking at the render: four inline colours lived outside the styles object, so
+    // the provider names stayed dark-theme white and were invisible on the light card. The
+    // source must hold no colour literals at all, or the next one hides the same way.
+    // (Checked here rather than in a browser because it is a property of the file.)
+    console.log('  theme resolver + palettes OK');
+}
+
 (async () => {
     archiverCheck();
     await signingCheck();
@@ -258,6 +313,7 @@ async function collectCheck(): Promise<void> {
     piiCheck();
     archiverBranchCheck();
     await collectCheck();
+    themeCheck();
     console.log('ALL CHECKS PASSED');
 })().catch((e) => {
     console.error('\n' + (e instanceof Error ? e.message : String(e)));
