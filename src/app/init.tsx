@@ -56,6 +56,51 @@ function friendlyUploadError(e: string | undefined): string {
 
 // ─── App ────────────────────────────────────────────────────────────────────
 
+
+/*
+  The week-at-a-glance the client approved in the demo (12 Aug), computed from
+  the records actually captured rather than seeded: latest value per data type
+  across the prepared archives. Anything the capture did not include stays
+  absent instead of being invented.
+*/
+interface RingSummary {
+    readiness: number | null;
+    sleepHours: string | null;
+    steps: number | null;
+    avgHr: number | null;
+    hrv: number | null;
+    spo2: number | null;
+    tempDev: number | null;
+}
+
+function summarize(archives: HealthArchive[]): RingSummary {
+    const latest: Record<string, Record<string, unknown>> = {};
+    const stamps: Record<string, string> = {};
+    for (const a of archives) {
+        for (const r of a.records) {
+            if (typeof r.value !== 'object' || r.value === null) continue;
+            if (!stamps[r.dataType] || r.collectedAt > stamps[r.dataType]) {
+                stamps[r.dataType] = r.collectedAt;
+                latest[r.dataType] = r.value as Record<string, unknown>;
+            }
+        }
+    }
+    const num = (t: string, k: string): number | null => {
+        const v = latest[t]?.[k];
+        return typeof v === 'number' ? v : null;
+    };
+    const totalSec = num('sleep_session', 'totalSec');
+    return {
+        readiness: num('readiness_score', 'score'),
+        sleepHours: totalSec === null ? null : `${Math.floor(totalSec / 3600)} h ${String(Math.round((totalSec % 3600) / 60)).padStart(2, '0')} m`,
+        steps: num('step_count', 'value'),
+        avgHr: num('heart_rate', 'avg'),
+        hrv: num('hrv_rmssd', 'value'),
+        spo2: num('spo2', 'avg'),
+        tempDev: num('body_temperature', 'value'),
+    };
+}
+
 function App({ secureInterface, theme }: { secureInterface: SecureInterface | null; theme: ThemeName }) {
     // Every colour below comes from here, so a theme change is one re-render, not a repaint
     // scattered across the tree.
@@ -212,6 +257,17 @@ function App({ secureInterface, theme }: { secureInterface: SecureInterface | nu
         archiveCard: { backgroundColor: c.surfaceSunken, border: `1px solid ${c.line}`, borderRadius: '10px', padding: '14px 16px', display: 'flex', flexDirection: 'column' as const, gap: '8px' },
         nft: (yes: boolean) => ({ fontSize: '12px', fontWeight: 600, color: yes ? c.warn : c.inkFaint, whiteSpace: 'nowrap' as const }),
         statusLine: (t: Tone) => ({ fontSize: '14px', margin: 0, fontWeight: 500, color: t === 'warn' ? c.warn : t === 'success' ? c.success : c.accent }),
+        dashGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '14px' },
+        dashScore: { display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 18px', backgroundColor: c.surfaceSunken, border: `1px solid ${c.line}`, borderRadius: '14px' },
+        dashRing: (pct: number) => ({ width: '72px', height: '72px', borderRadius: '50%', flexShrink: 0, background: `conic-gradient(${c.accent} ${pct}%, ${c.accentWashStrong} 0)`, display: 'grid', placeItems: 'center' as const }),
+        dashRingInner: { width: '56px', height: '56px', borderRadius: '50%', backgroundColor: c.surface, display: 'grid', placeItems: 'center' as const, fontSize: '19px', fontWeight: 700, color: c.ink },
+        dashBig: { fontSize: '24px', fontWeight: 700, color: c.ink, lineHeight: 1.1 },
+        dashLabel: { fontSize: '13.5px', fontWeight: 600, color: c.ink },
+        dashNote: { fontSize: '12.5px', color: c.inkFaint, marginTop: '2px' },
+        vitalCard: { padding: '14px 16px', backgroundColor: c.surfaceSunken, border: `1px solid ${c.line}`, borderRadius: '14px' },
+        vitalLabel: { fontSize: '12.5px', color: c.inkFaint },
+        vitalValue: { fontSize: '22px', fontWeight: 700, color: c.ink, marginTop: '4px' },
+        vitalUnit: { fontSize: '13px', fontWeight: 500, color: c.inkMuted, marginLeft: '4px' },
     };
 
     if (!secureInterface) {
@@ -357,6 +413,75 @@ function App({ secureInterface, theme }: { secureInterface: SecureInterface | nu
             )}
 
             {/* RESULTS */}
+            {/* WEEK AT A GLANCE - the demo's dashboard (client-approved 12 Aug), computed
+                from the records just captured. Renders only what the capture contained. */}
+            {estimate && archives && (() => {
+                const sum = summarize(archives);
+                return (
+                    <div style={s.card}>
+                        <h3 style={s.h3}>Latest from your ring</h3>
+                        <div style={s.dashGrid}>
+                            {sum.readiness !== null && (
+                                <div style={s.dashScore}>
+                                    <div style={s.dashRing(sum.readiness)} role="img" aria-label={`${sum.readiness} out of 100`}>
+                                        <span style={s.dashRingInner}>{sum.readiness}</span>
+                                    </div>
+                                    <div>
+                                        <div style={s.dashLabel}>Readiness</div>
+                                        <div style={s.dashNote}>score out of 100</div>
+                                    </div>
+                                </div>
+                            )}
+                            {sum.sleepHours !== null && (
+                                <div style={s.dashScore}>
+                                    <div>
+                                        <div style={s.dashBig}>{sum.sleepHours}</div>
+                                        <div style={s.dashLabel}>Sleep</div>
+                                        <div style={s.dashNote}>latest night</div>
+                                    </div>
+                                </div>
+                            )}
+                            {sum.steps !== null && (
+                                <div style={s.dashScore}>
+                                    <div>
+                                        <div style={s.dashBig}>{sum.steps.toLocaleString()}</div>
+                                        <div style={s.dashLabel}>Steps</div>
+                                        <div style={s.dashNote}>latest day</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <div style={s.dashGrid}>
+                            {sum.avgHr !== null && (
+                                <div style={s.vitalCard}>
+                                    <div style={s.vitalLabel}>Average heart rate</div>
+                                    <div style={s.vitalValue}>{sum.avgHr}<span style={s.vitalUnit}>bpm</span></div>
+                                </div>
+                            )}
+                            {sum.hrv !== null && (
+                                <div style={s.vitalCard}>
+                                    <div style={s.vitalLabel}>Heart rate variability</div>
+                                    <div style={s.vitalValue}>{sum.hrv}<span style={s.vitalUnit}>ms</span></div>
+                                </div>
+                            )}
+                            {sum.spo2 !== null && (
+                                <div style={s.vitalCard}>
+                                    <div style={s.vitalLabel}>Blood oxygen</div>
+                                    <div style={s.vitalValue}>{sum.spo2}<span style={s.vitalUnit}>%</span></div>
+                                </div>
+                            )}
+                            {sum.tempDev !== null && (
+                                <div style={s.vitalCard}>
+                                    <div style={s.vitalLabel}>Skin temperature</div>
+                                    <div style={s.vitalValue}>{sum.tempDev > 0 ? '+' : ''}{sum.tempDev.toFixed(2)}<span style={s.vitalUnit}>°C vs baseline</span></div>
+                                </div>
+                            )}
+                        </div>
+                        <p style={s.helper}>Computed from the archives below; the vault stores the full records.</p>
+                    </div>
+                );
+            })()}
+
             {estimate && archives && (
                 <div style={s.card}>
                     <h3 style={s.h3}>Archives</h3>
