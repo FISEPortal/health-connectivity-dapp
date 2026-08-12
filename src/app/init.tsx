@@ -124,6 +124,10 @@ function App({ secureInterface, theme }: { secureInterface: SecureInterface | nu
     const [estimate, setEstimate] = useState<NftEstimate | null>(null);
     const [uploads, setUploads] = useState<UploadOutcome[] | null>(null);
 
+    // The capture details fold closed (Amos, 12 Aug): opening the capture should
+    // read like the approved demo - pick a source, press one button. The folded
+    // defaults are the demo's: reference key, last 90 days, weekly, personal.
+    const [showOptions, setShowOptions] = useState(false);
     const [status, setStatus] = useState('');
     const [tone, setTone] = useState<Tone>('info');
     const [busy, setBusy] = useState(false);
@@ -345,25 +349,11 @@ function App({ secureInterface, theme }: { secureInterface: SecureInterface | nu
                         <button style={s.link} onClick={() => { setSelected(null); resetResults(); }}>← Change device</button>
                     </div>
 
-                    <div style={s.grid2}>
-                        <div style={s.formGroup}>
-                            <label style={s.label}>Source</label>
-                            <div style={s.toggleGroup}>
-                                <button style={s.toggleBtn(source === 'sandbox')} onClick={() => setSource('sandbox')}>Sandbox (demo data)</button>
-                                <button style={s.toggleBtn(source === 'live')} onClick={() => setSource('live')}>Live</button>
-                            </div>
-                        </div>
-                        <div style={s.formGroup}>
-                            <label style={s.label}>Signing</label>
-                            <div style={s.toggleGroup}>
-                                <button style={s.toggleBtn(signMode === 'reference')} onClick={() => setSignMode('reference')}>Reference key</button>
-                                <button style={s.toggleBtn(signMode === 'wallet')} onClick={() => setSignMode('wallet')}>Signet wallet</button>
-                            </div>
-                            <p style={s.helper}>
-                                {signMode === 'reference'
-                                    ? 'Reference: sandbox preview. Archives stay recoverable but are not wallet-private. Use Signet wallet for private, shareable archives.'
-                                    : 'Signet wallet signs and privately encrypts each archive - one approval per archive.'}
-                            </p>
+                    <div style={s.formGroup}>
+                        <label style={s.label}>Source</label>
+                        <div style={s.toggleGroup}>
+                            <button style={s.toggleBtn(source === 'sandbox')} onClick={() => setSource('sandbox')}>Sandbox (demo data)</button>
+                            <button style={s.toggleBtn(source === 'live')} onClick={() => setSource('live')}>Live</button>
                         </div>
                     </div>
 
@@ -374,6 +364,20 @@ function App({ secureInterface, theme }: { secureInterface: SecureInterface | nu
                             {liveNote && <p style={s.helper}>{provider.name} has no live connection yet - use Sandbox for now.</p>}
                         </div>
                     )}
+
+                    {showOptions && (<>
+                    <div style={s.formGroup}>
+                        <label style={s.label}>Signing</label>
+                        <div style={s.toggleGroup}>
+                            <button style={s.toggleBtn(signMode === 'reference')} onClick={() => setSignMode('reference')}>Reference key</button>
+                            <button style={s.toggleBtn(signMode === 'wallet')} onClick={() => setSignMode('wallet')}>Signet wallet</button>
+                        </div>
+                        <p style={s.helper}>
+                            {signMode === 'reference'
+                                ? 'Reference: sandbox preview. Archives stay recoverable but are not wallet-private. Use Signet wallet for private, shareable archives.'
+                                : 'Signet wallet signs and privately encrypts each archive - one approval per archive.'}
+                        </p>
+                    </div>
 
                     <div style={s.grid2}>
                         <div style={s.formGroup}>
@@ -405,10 +409,16 @@ function App({ secureInterface, theme }: { secureInterface: SecureInterface | nu
                         </div>
                         <p style={s.helper}>Shareable archives are each represented by an NFT (~1 cent each). Personal archives stay encrypted in your vault with no fee.</p>
                     </div>
+                    </>)}
 
-                    <button style={s.btn(busy)} onClick={prepare} disabled={busy}>
-                        {busy && !archives ? 'Preparing…' : 'Prepare archives'}
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' as const }}>
+                        <button style={s.btn(busy)} onClick={prepare} disabled={busy}>
+                            {busy && !archives ? 'Preparing…' : 'Prepare archives'}
+                        </button>
+                        <button style={s.link} onClick={() => setShowOptions((v) => !v)}>
+                            {showOptions ? 'Hide options' : 'Options'}
+                        </button>
+                    </div>
                 </div>
             )}
 
