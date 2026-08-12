@@ -183,11 +183,11 @@ function App({ secureInterface, theme }: { secureInterface: SecureInterface | nu
     const s = {
         root: { backgroundColor: c.ground, color: c.ink, padding: 'clamp(16px, 4vw, 32px)', fontFamily: 'system-ui, -apple-system, sans-serif', minHeight: '100dvh', boxSizing: 'border-box' as const, display: 'flex', flexDirection: 'column' as const, gap: 'clamp(16px, 3vw, 24px)' },
         header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: `1px solid ${c.line}`, paddingBottom: '16px', gap: '16px', flexWrap: 'wrap' as const },
-        h1: { margin: 0, fontSize: '26px', fontWeight: 700, background: `linear-gradient(to right, ${c.titleFrom}, ${c.titleTo})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+        h1: { margin: 0, fontSize: '24px', fontWeight: 600, color: c.ink, letterSpacing: '-0.01em' },
         subtitle: { margin: '6px 0 0 0', color: c.inkMuted, fontSize: '14px' },
         badge: { background: c.successWash, color: c.success, border: `1px solid ${c.successBorder}`, padding: '4px 12px', borderRadius: '9999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' as const },
-        card: { backgroundColor: c.surface, border: `1px solid ${c.line}`, borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column' as const, gap: '18px' },
-        h3: { color: c.accent, fontSize: '15px', fontWeight: 600, margin: 0, textTransform: 'uppercase' as const, letterSpacing: '0.05em' },
+        card: { backgroundColor: c.surface, border: `1px solid ${c.line}`, borderRadius: '14px', padding: '20px', display: 'flex', flexDirection: 'column' as const, gap: '18px' },
+        h3: { color: c.titleTo, fontSize: '14px', fontWeight: 700, margin: 0, textTransform: 'uppercase' as const, letterSpacing: '0.04em' },
         p: { color: c.inkMuted, fontSize: '14px', margin: 0, overflowWrap: 'anywhere' as const },
         helper: { color: c.inkFaint, fontSize: '12px', margin: 0, lineHeight: 1.5 },
         banner: { background: c.accentWash, color: c.inkMuted, border: `1px solid ${c.accentBorder}`, borderRadius: '12px', padding: '16px', fontSize: '14px', lineHeight: 1.55 },
@@ -201,11 +201,11 @@ function App({ secureInterface, theme }: { secureInterface: SecureInterface | nu
         formGroup: { display: 'flex', flexDirection: 'column' as const, gap: '8px' },
         grid2: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '18px' },
         label: { fontSize: '13px', fontWeight: 600, color: c.inkMuted },
-        input: { backgroundColor: c.field, border: `1px solid ${c.fieldBorder}`, borderRadius: '8px', padding: '10px 14px', color: c.ink, fontSize: '14px', outline: 'none', minHeight: '44px', boxSizing: 'border-box' as const },
-        select: { backgroundColor: c.field, border: `1px solid ${c.fieldBorder}`, borderRadius: '8px', padding: '10px 14px', color: c.ink, fontSize: '14px', outline: 'none', cursor: 'pointer', minHeight: '44px', boxSizing: 'border-box' as const },
-        toggleGroup: { display: 'flex', flexWrap: 'wrap' as const, background: c.field, borderRadius: '8px', padding: '2px', width: 'fit-content', maxWidth: '100%' },
-        toggleBtn: (active: boolean) => ({ backgroundColor: active ? c.accent : 'transparent', color: active ? c.onAccent : c.inkMuted, border: 'none', borderRadius: '6px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }),
-        btn: (disabled: boolean) => ({ background: disabled ? c.field : `linear-gradient(to right, ${c.buttonFrom}, ${c.buttonTo})`, color: disabled ? c.inkFaint : c.onAccent, padding: '12px 24px', border: 'none', borderRadius: '8px', cursor: disabled ? 'not-allowed' : 'pointer', fontWeight: 600 as const, width: 'fit-content', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }),
+        input: { backgroundColor: c.field, border: `1px solid ${c.fieldBorder}`, borderRadius: '10px', padding: '10px 14px', color: c.ink, fontSize: '14px', outline: 'none', minHeight: '44px', boxSizing: 'border-box' as const },
+        select: { backgroundColor: c.field, border: `1px solid ${c.fieldBorder}`, borderRadius: '10px', padding: '10px 14px', color: c.ink, fontSize: '14px', outline: 'none', cursor: 'pointer', minHeight: '44px', boxSizing: 'border-box' as const },
+        toggleGroup: { display: 'inline-flex', flexWrap: 'wrap' as const, background: c.accentWashStrong, borderRadius: '9999px', padding: '3px', width: 'fit-content', maxWidth: '100%', gap: '4px' },
+        toggleBtn: (active: boolean) => ({ backgroundColor: active ? c.surface : 'transparent', color: active ? c.titleTo : c.inkMuted, border: 'none', borderRadius: '9999px', padding: '8px 16px', fontSize: '13px', fontWeight: active ? 600 : 500, cursor: 'pointer', minHeight: '40px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxShadow: active ? `0 1px 2px ${c.accentWash}` : 'none' }),
+        btn: (disabled: boolean) => ({ background: disabled ? c.field : c.buttonFrom, color: disabled ? c.inkFaint : c.onAccent, padding: '12px 26px', border: 'none', borderRadius: '9999px', cursor: disabled ? 'not-allowed' : 'pointer', fontWeight: 600 as const, width: 'fit-content', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }),
         link: { background: 'none', border: 'none', color: c.accent, cursor: 'pointer', fontSize: '13px', fontWeight: 600, padding: 0 },
         comingSoon: { color: c.inkFaint, fontSize: '12px', fontWeight: 600, border: `1px solid ${c.line}`, borderRadius: '9999px', padding: '5px 13px', whiteSpace: 'nowrap' as const, flexShrink: 0 },
         chip: { display: 'inline-block', background: c.accentWashStrong, color: c.accent, padding: '3px 9px', borderRadius: '6px', fontSize: '11px', fontWeight: 600, margin: '0 6px 6px 0' },
@@ -222,7 +222,6 @@ function App({ secureInterface, theme }: { secureInterface: SecureInterface | nu
                         <h1 style={s.h1}>Health Connectivity</h1>
                         <p style={s.subtitle}>Bring your wearables into your Signet vault.</p>
                     </div>
-                    <span style={s.badge}>Secured by Signet</span>
                 </div>
                 <div style={s.card}>
                     <p style={s.p}>Running outside Signet - launch this inside a Signet container.</p>
@@ -240,7 +239,8 @@ function App({ secureInterface, theme }: { secureInterface: SecureInterface | nu
                     <h1 style={s.h1}>Health Connectivity</h1>
                     <p style={s.subtitle}>Bring your wearables into your Signet vault.</p>
                 </div>
-                <span style={s.badge}>Secured by Signet</span>
+                {/* "Secured by Signet" removed: the Signet logo already brands the frame
+                    this renders in (Amos, 12 Aug). Restore point: tag look-pre-restyle-2026-08-12. */}
             </div>
 
             {/* Profile/DID card intentionally removed - the Signet container already
